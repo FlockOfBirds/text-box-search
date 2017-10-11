@@ -6,44 +6,50 @@ import { TextBoxSearch, TextBoxSearchProps } from "../TextBoxSearch";
 describe("TextBoxSearch", () => {
     const renderSearchBar = (props: TextBoxSearchProps) => shallow(createElement(TextBoxSearch, props));
     const mountSearchBar = (props: TextBoxSearchProps) => mount(createElement(TextBoxSearch, props));
-    const searchBarProps: TextBoxSearchProps = {
-        defaultQuery: "query",
+    const textSearchProps: TextBoxSearchProps = {
+        defaultQuery: "",
         onTextChangeAction:  jasmine.any(Function) as any,
-        showSearchBar: true
+        placeholder: "search"
     };
 
     it("renders the structure correctly", () => {
-        const searchBar = renderSearchBar(searchBarProps);
+        const searchBar = renderSearchBar(textSearchProps);
 
         expect(searchBar).toBeElement(
             createElement("div", { className: "search-bar" },
-                createElement("span", { className: "glyphicon glyphicon-search" }),
-                createElement("input", { className: "form-control", placeholder: "" }),
-                createElement("button", { className: "btn-transparent" },
+                createElement("input", {
+                    className: "form-control",
+                    onChange: jasmine.any(Function) as any,
+                    placeholder: textSearchProps.placeholder,
+                    value: textSearchProps.defaultQuery
+                }),
+                createElement("button",
+                    {
+                        className: "",
+                        onClick: jasmine.any(Function) as any
+                    },
                     createElement("span", { className: "glyphicon glyphicon-remove" })
                 )
             )
         );
     });
 
-    it("does not render when show appearance is set to no", () => {
-        const barProps: TextBoxSearchProps = {
-            ...searchBarProps,
-            showSearchBar: false
-        };
-
-        const searchBar = renderSearchBar(barProps);
-
-        expect(searchBar).toBeElement("");
-    });
-
     it("renders with the specified placeholder", () => {
-        const searchBar = renderSearchBar(searchBarProps);
+        const newSearchProps: TextBoxSearchProps = {
+            defaultQuery: "query",
+            onTextChangeAction:  jasmine.any(Function) as any,
+            placeholder: "search"
+        };
+        const searchBar = renderSearchBar(newSearchProps);
 
         expect(searchBar).toBeElement(
             createElement("div", { className: "search-bar" },
-                createElement("span", { className: "glyphicon glyphicon-search" }),
-                createElement("input", { className: "form-control", placeholder: "Search" }),
+                createElement("input", {
+                    className: "form-control",
+                    onChange: jasmine.any(Function) as any,
+                    placeholder: textSearchProps.placeholder,
+                    value: ""
+                }),
                 createElement("button", { className: "btn-transparent" },
                     createElement("span", { className: "glyphicon glyphicon-remove" })
                 )
@@ -55,7 +61,7 @@ describe("TextBoxSearch", () => {
         it("accepts value", (done) => {
             const newValue = "Kenya";
             const barProps: TextBoxSearchProps = {
-                ...searchBarProps,
+                ...textSearchProps,
                 onTextChangeAction: value => value
             };
             spyOn(barProps, "onTextChangeAction").and.callThrough();
@@ -71,33 +77,32 @@ describe("TextBoxSearch", () => {
         });
 
         it("renders with specified default query", () => {
-            const searchBar = renderSearchBar(searchBarProps);
+            const newSearchProps: TextBoxSearchProps = {
+                defaultQuery: "Birds",
+                onTextChangeAction: jasmine.any(Function) as any,
+                placeholder: "search"
+            };
+            const searchBar = renderSearchBar(newSearchProps);
+            const textSearxhInstance = searchBar.instance() as any;
+            textSearxhInstance.componentDidMount();
 
-            expect(searchBar).toBeElement(
-                createElement("div", { className: "search-bar" },
-                    createElement("span", { className: "glyphicon glyphicon-search" }),
-                    createElement("input", { className: "form-control", placeholder: "", value: "search bar" }),
-                    createElement("button", { className: "btn-transparent" },
-                        createElement("span", { className: "glyphicon glyphicon-remove" })
-                    )
-                )
-            );
+            expect(searchBar.state().query).toEqual("Birds");
         });
 
         it("updates when the search value changes", (done) => {
-            const newValue = "English";
+            const newValue = "NET";
             const barProps: TextBoxSearchProps = {
-                ...searchBarProps,
+                ...textSearchProps,
                 onTextChangeAction: value => value
             };
             spyOn(barProps, "onTextChangeAction").and.callThrough();
             const wrapper = renderSearchBar(barProps);
             const input: any = wrapper.find("input");
 
-            input.simulate("change", { currentTarget: { value: barProps.defaultQuery } });
+            input.simulate("change", { currentTarget: { value: "SA" } });
 
             setTimeout(() => {
-                expect(barProps.onTextChangeAction).toHaveBeenCalledWith(barProps.defaultQuery);
+                expect(barProps.onTextChangeAction).toHaveBeenCalledWith("SA");
 
                 input.simulate("change", { currentTarget: { value: newValue } });
 
@@ -109,7 +114,7 @@ describe("TextBoxSearch", () => {
         });
 
         it("is cleared when the remove button is clicked", () => {
-            const wrapper = mountSearchBar(searchBarProps);
+            const wrapper = mountSearchBar(textSearchProps);
             const input: any = wrapper.find("input");
             const button: any = wrapper.find("button");
 

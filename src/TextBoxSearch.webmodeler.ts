@@ -22,7 +22,7 @@ export class preview extends Component<ContainerProps, ContainerState> {
                 style: parseStyle(this.props.style)
             },
             this.renderAlert(),
-            this.renderDropDownFilter()
+            this.renderTextBoxSearch()
         );
     }
 
@@ -61,7 +61,7 @@ export class preview extends Component<ContainerProps, ContainerState> {
         });
     }
 
-    private renderDropDownFilter(): ReactElement<TextBoxSearchProps> {
+    private renderTextBoxSearch(): ReactElement<TextBoxSearchProps> {
 
         return createElement(TextBoxSearch, {
             defaultQuery: "",
@@ -72,10 +72,4 @@ export class preview extends Component<ContainerProps, ContainerState> {
 
 export function getPreviewCss() {
     return require("./components/ui/TextBoxSearch.scss");
-}
-
-export function getVisibleProperties(valueMap: ContainerProps, visibilityMap: any) {
-    valueMap.showSearchBar = visibilityMap.showSearchBar = false;
-
-    return visibilityMap;
 }
