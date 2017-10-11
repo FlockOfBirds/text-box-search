@@ -22,15 +22,12 @@ export interface ContainerProps extends WrapperProps {
     defaultQuery: string;
     entity: string;
     placeHolder: string;
-    searchMethod: searchMethodsOptions;
-    showSearchBar: boolean;
 }
 
 export interface SearchAttributes {
     attribute: string;
 }
 
-export type searchMethodsOptions = "equals" | "contains";
 type HybridConstraint = Array<{ attribute: string; operator: string; value: string; path?: string; }>;
 
 export interface ListView extends mxui.widget._WidgetBase {
@@ -92,8 +89,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
             return createElement(TextBoxSearch, {
                 defaultQuery: this.props.defaultQuery,
                 onTextChangeAction: this.handleChange,
-                placeholder: this.props.placeHolder,
-                showSearchBar: this.props.showSearchBar
+                placeholder: this.props.placeHolder
             });
         }
 
@@ -105,7 +101,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
         if (targetListView && targetListView._datasource && targetNode) {
             this.showLoader(targetNode);
             this.props.attributetList.forEach(searchAttribute => {
-                targetListView._datasource._constraints = `[${this.props.searchMethod}(${searchAttribute.attribute},'${query}')]`;
+                targetListView._datasource._constraints = `[contains(${searchAttribute.attribute},'${query}')]`;
                 targetListView.update(null, () => this.hideLoader(targetNode));
             });
         }

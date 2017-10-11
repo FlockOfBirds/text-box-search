@@ -5,7 +5,6 @@ import "./ui/TextBoxSearch.scss";
 export interface TextBoxSearchProps {
     defaultQuery: string;
     placeholder?: string;
-    showSearchBar?: boolean;
     onTextChangeAction: (query: string) => void;
 }
 
@@ -24,26 +23,21 @@ export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchSt
     }
 
     render() {
-        if (this.props.showSearchBar) {
-            return createElement("div", { className: "search-bar" },
-                createElement("span", { className: "glyphicon glyphicon-search" }),
-                createElement("input", {
-                    className: "form-control",
-                    onChange: this.handleOnChange,
-                    placeholder: this.props.placeholder,
-                    value: this.state.query
-                }),
-                createElement("button",
-                    {
-                        className: `btn-transparent ${this.state.query ? "visible" : "hidden"}`,
-                        onClick: this.resetQuery
-                    },
-                    createElement("span", { className: "glyphicon glyphicon-remove" })
-                )
-            );
-        } else {
-            return null;
-        }
+        return createElement("div", { className: "search-bar" },
+            createElement("input", {
+                className: "form-control",
+                onChange: this.handleOnChange,
+                placeholder: this.props.placeholder,
+                value: this.state.query
+            }),
+            createElement("button",
+                {
+                    className: `btn-transparent ${this.state.query ? "visible" : "hidden"}`,
+                    onClick: this.resetQuery
+                },
+                createElement("span", { className: "glyphicon glyphicon-remove" })
+            )
+        );
     }
 
     componentDidMount() {
@@ -61,7 +55,7 @@ export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchSt
     }
 
     private geTimeOut(): number {
-        return this.props.showSearchBar === false || this.props.defaultQuery ? 0 : 500;
+        return this.props.defaultQuery ? 0 : 500;
     }
 
     private resetQuery() {

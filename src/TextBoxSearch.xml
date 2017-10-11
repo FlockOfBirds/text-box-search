@@ -6,26 +6,17 @@
     <properties>
         <property key="entity" type="entity">
             <caption>List view with entity</caption>
-            <category>Data source</category>
+            <category>General</category>
             <description>Entity whose attributes will be searched. This entity should match the list view entity</description>
         </property>
-        <property key="searchMethod" type="enumeration" defaultValue="contains">
-            <caption>Search method</caption>
-            <category>Data source</category>
-            <description/>
-            <enumerationValues>
-                <enumerationValue key="equals">Equals</enumerationValue>
-                <enumerationValue key="contains">Contains</enumerationValue>
-            </enumerationValues>
-        </property>
         <property key="attributetList" type="object" isList="true">
-            <caption>Search attributes</caption>
-            <category>Data source</category>
+            <caption>Attributes</caption>
+            <category>General</category>
             <description/>
             <properties>
                 <property key="attribute" type="attribute" isPath="optional" pathType="reference" entityProperty="../entity">
                     <caption>Attribute</caption>
-                    <category>Data source</category>
+                    <category>General</category>
                     <description>The attribute of the list view entity</description>
                     <attributeTypes>
                         <attributeType name="String"/>
@@ -41,17 +32,12 @@
         </property>
         <property key="defaultQuery" type="translatableString" required="false">
             <caption>Default query</caption>
-            <category>Data source</category>
+            <category>General</category>
             <description>The default query that is used to filter the list</description>
-        </property>
-        <property key="showSearchBar" type="boolean" defaultValue="true">
-            <caption>Show search bar</caption>
-            <category>Appearance</category>
-            <description> It controls if the search bar should be visible or not</description>
         </property>
         <property key="placeHolder" type="translatableString" required="false">
             <caption>Placeholder</caption>
-            <category>Appearance</category>
+            <category>General </category>
             <description>Specifies a short hint that describes the expected value of the search input field</description>
             <translations>
                 <translation lang="en_US">Search</translation>
