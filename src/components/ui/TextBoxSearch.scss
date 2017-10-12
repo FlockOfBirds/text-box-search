@@ -4,7 +4,7 @@
 
 .widget-text-box-search .search-bar input {
     display: inline-block;
-    padding-left: 30px;
+    padding-left: 10px;
 }
 
 .widget-text-box-search .search-bar .btn-transparent {
@@ -23,13 +23,3 @@
     top: 9px;
 }
 
-.widget-text-box-search-loading > * {
-    opacity: 0 !important;
-}
-
-.widget-text-box-search-loading {
-    background-color: rgba(211, 211, 211, 0.2);
-    background-image: url(./loading.gif);
-    background-repeat: no-repeat;
-    background-position: center center;
-}
