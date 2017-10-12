@@ -37,7 +37,7 @@ export interface ListView extends mxui.widget._WidgetBase {
     filter: {
         [key: string ]: HybridConstraint | string;
     };
-    update: (obj: mendix.lib.MxObject | null, callback?: () => void) => void;
+    update: (obj?: mendix.lib.MxObject | null, callback?: () => void) => void;
 }
 
 export interface ContainerState {
@@ -99,10 +99,9 @@ export default class SearchContainer extends Component<ContainerProps, Container
     private handleChange(query: string) {
         const { targetListView, targetNode } = this.state;
         if (targetListView && targetListView._datasource && targetNode) {
-            this.showLoader(targetNode);
             this.props.attributetList.forEach(searchAttribute => {
                 targetListView._datasource._constraints = `[contains(${searchAttribute.attribute},'${query}')]`;
-                targetListView.update(null, () => this.hideLoader(targetNode));
+                targetListView.update();
             });
         }
     }
@@ -127,17 +126,5 @@ export default class SearchContainer extends Component<ContainerProps, Container
             validate: true
         });
         this.setState({ listviewAvailable: false, validationPassed: !validateMessage });
-    }
-
-    private showLoader(node?: HTMLElement) {
-        if (node) {
-            node.classList.add("widget-text-box-search-loading");
-        }
-    }
-
-    private hideLoader(node?: HTMLElement) {
-        if (node) {
-            node.classList.remove("widget-text-box-search-loading");
-        }
     }
 }
