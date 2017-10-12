@@ -9,20 +9,6 @@
             <category>General</category>
             <description>Entity whose attributes will be searched. This entity should match the list view entity</description>
         </property>
-        <property key="placeHolder" type="translatableString" required="false">
-            <caption>Placeholder</caption>
-            <category>General</category>
-            <description>Specifies a short hint that describes the expected value of the search input field</description>
-            <translations>
-                <translation lang="en_US">Search</translation>
-                <translation lang="nl_NL">Zoeken</translation>
-            </translations>
-        </property>
-        <property key="defaultQuery" type="translatableString" required="false">
-            <caption>Default query</caption>
-            <category>General</category>
-            <description>The default query that is used to filter the list</description>
-        </property>
         <property key="attributetList" type="object" isList="true">
             <caption>Attributes</caption>
             <category>General</category>
@@ -43,6 +29,20 @@
                     </attributeTypes>
                 </property>
             </properties>
+        </property>
+        <property key="placeHolder" type="translatableString" required="false">
+            <caption>Placeholder</caption>
+            <category>General</category>
+            <description>Specifies a short hint that describes the expected value of the search input field</description>
+            <translations>
+                <translation lang="en_US">Search</translation>
+                <translation lang="nl_NL">Zoeken</translation>
+            </translations>
+        </property>
+        <property key="defaultQuery" type="translatableString" required="false">
+            <caption>Default query</caption>
+            <category>General</category>
+            <description>The default query that is used to filter the list</description>
         </property>
     </properties>
 </widget>
