@@ -11,7 +11,7 @@ describe("Alert", () => {
     beforeEach(() => {
         defaultProps = {
             bootstrapStyle: "danger",
-            className: "widget-drop-down-filter",
+            className: "widget-text-box-search",
             message
         };
     });
@@ -20,7 +20,7 @@ describe("Alert", () => {
         const alert = renderAlert(defaultProps);
 
         expect(alert).toBeElement(
-            createElement("div", { className: "alert alert-danger widget-drop-down-filter" }, message)
+            createElement("div", { className: "alert alert-danger widget-text-box-search" }, message)
         );
     });
 

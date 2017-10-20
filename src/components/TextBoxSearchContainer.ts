@@ -1,13 +1,12 @@
 import { Component, ReactElement, createElement } from "react";
 import { findDOMNode } from "react-dom";
-
-import { Alert } from "./Alert";
-import { TextBoxSearch, TextBoxSearchProps } from "./TextBoxSearch";
-import { Utils, parseStyle } from "../utils/ContainerUtils";
-
-import * as classNames from "classnames";
 import * as dijitRegistry from "dijit/registry";
 import * as dojoConnect from "dojo/_base/connect";
+import * as classNames from "classnames";
+
+import { TextBoxSearch, TextBoxSearchProps } from "./TextBoxSearch";
+import { Utils, parseStyle } from "../utils/ContainerUtils";
+import { Alert } from "./Alert";
 
 interface WrapperProps {
     class: string;
@@ -28,15 +27,9 @@ export interface SearchAttributes {
     attribute: string;
 }
 
-type HybridConstraint = Array<{ attribute: string; operator: string; value: string; path?: string; }>;
-
 export interface ListView extends mxui.widget._WidgetBase {
-    _datasource: {
-        _constraints: HybridConstraint | string;
-    };
-    filter: {
-        [key: string ]: HybridConstraint | string;
-    };
+    _datasource: { _constraints: string; };
+    filter: { [key: string ]: string; };
     update: (obj?: mendix.lib.MxObject | null, callback?: () => void) => void;
 }
 
@@ -48,6 +41,7 @@ export interface ContainerState {
 }
 
 export default class SearchContainer extends Component<ContainerProps, ContainerState> {
+
     constructor(props: ContainerProps) {
         super(props);
 
@@ -65,7 +59,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
                 style: parseStyle(this.props.style)
             },
             this.renderAlert(),
-            this.renderSearch()
+            this.renderTextBoxSearch()
         );
     }
 
@@ -84,8 +78,9 @@ export default class SearchContainer extends Component<ContainerProps, Container
         });
     }
 
-    private renderSearch(): ReactElement<TextBoxSearchProps> {
+    private renderTextBoxSearch(): ReactElement<TextBoxSearchProps> {
         if (this.state.validationPassed) {
+
             return createElement(TextBoxSearch, {
                 defaultQuery: this.props.defaultQuery,
                 onTextChangeAction: this.handleChange,
@@ -98,11 +93,33 @@ export default class SearchContainer extends Component<ContainerProps, Container
 
     private handleChange(query: string) {
         const { targetListView, targetNode } = this.state;
+        this.showLoader(targetNode);
+        const constraints: string[] = [];
         if (targetListView && targetListView._datasource && targetNode) {
+            const isReference = this.props.entity && Utils.itContains(this.props.entity, "/");
             this.props.attributetList.forEach(searchAttribute => {
-                targetListView._datasource._constraints = `[contains(${searchAttribute.attribute},'${query}')]`;
-                targetListView.update();
+                isReference
+                    ?
+                    targetListView._datasource._constraints = `${this.props.entity}[contains(${searchAttribute.attribute},'${query}')]`
+                    :
+                    constraints.push(`contains(${searchAttribute.attribute},'${query}')`);
             });
+            targetListView._datasource._constraints = "[" + constraints.join(" or ") + "]";
+            targetListView.update(null, () => {
+                this.hideLoader(targetNode);
+            });
+        }
+    }
+
+    private showLoader(node?: HTMLElement) {
+        if (node) {
+            node.classList.add("widget-text-box-search-loading");
+        }
+    }
+
+    private hideLoader(node?: HTMLElement) {
+        if (node) {
+            node.classList.remove("widget-text-box-search-loading");
         }
     }
 

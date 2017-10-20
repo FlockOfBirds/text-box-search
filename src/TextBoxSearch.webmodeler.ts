@@ -9,6 +9,7 @@ import { Utils, parseStyle } from "./utils/ContainerUtils";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<ContainerProps, ContainerState> {
+
     constructor(props: ContainerProps) {
         super(props);
 
@@ -62,7 +63,6 @@ export class preview extends Component<ContainerProps, ContainerState> {
     }
 
     private renderTextBoxSearch(): ReactElement<TextBoxSearchProps> {
-
         return createElement(TextBoxSearch, {
             defaultQuery: "",
             onTextChangeAction: () => { return; }

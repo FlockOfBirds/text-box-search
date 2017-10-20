@@ -44,8 +44,17 @@ export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchSt
         this.setState({ query: this.props.defaultQuery });
     }
 
+    componentDidUpdate(_prevProps: TextBoxSearchProps, prevState: TextBoxSearchState) {
+        if (this.state.query !== prevState.query) {
+            setTimeout(() => {
+                this.props.onTextChangeAction(this.state.query);
+            }, this.geTimeOut());
+        }
+    }
+
     private handleOnChange(event: ChangeEvent<HTMLSelectElement>) {
         const query = event.currentTarget.value;
+
         if (this.state.query !== query) {
             setTimeout(() => {
                 this.props.onTextChangeAction(query);
