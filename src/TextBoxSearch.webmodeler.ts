@@ -65,7 +65,8 @@ export class preview extends Component<ContainerProps, ContainerState> {
     private renderTextBoxSearch(): ReactElement<TextBoxSearchProps> {
         return createElement(TextBoxSearch, {
             defaultQuery: "",
-            onTextChangeAction: () => { return; }
+            onTextChangeAction: () => { return; },
+            placeholder: "Search"
         });
     }
 }

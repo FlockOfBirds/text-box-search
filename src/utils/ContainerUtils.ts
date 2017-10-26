@@ -20,23 +20,19 @@ export const parseStyle = (style = ""): {[key: string]: string} => {
 
 export class Utils {
     static validate(props: ContainerProps & { filterNode: HTMLElement; targetListView: ListView; validate: boolean, isModeler?: boolean}): string {
-        const widgetName = "text-box-search";
-        // validate filter values if filterby = attribute, then value should not be empty or "" or " ".
-        if (!props.filterNode) {
-            return `${widgetName}: unable to find a listview with to attach to`;
-        }
+        const widgetName = "text-box search";
 
+        if (!(props.targetListView && props.targetListView._datasource)) {
+            return `Widget ${widgetName}: is not compatible with a specified list`;
+        }
+        if (!props.filterNode) {
+            return `Widget ${widgetName}: unable to find list to connect`;
+        }
         if (props.isModeler) {
             return "";
-        } else if (!(props.targetListView && props.targetListView._datasource)) {
-            return `${widgetName}: unable to find a listview with to attach to`;
         }
 
         return "";
-    }
-
-    static isCompatible(targetListView: ListView): boolean {
-        return !!(targetListView && targetListView._datasource);
     }
 
     static findTargetNode(filterNode: HTMLElement): HTMLElement | null {
