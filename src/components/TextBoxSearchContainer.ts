@@ -6,6 +6,7 @@ import * as classNames from "classnames";
 
 import { TextBoxSearch, TextBoxSearchProps } from "./TextBoxSearch";
 import { Utils, parseStyle } from "../utils/ContainerUtils";
+import { DataSourceHelper } from "../utils/DataSourceHelper/DataSourceHelper";
 import { Alert } from "./Alert";
 
 interface WrapperProps {
@@ -28,9 +29,19 @@ export interface SearchAttributes {
 }
 
 export interface ListView extends mxui.widget._WidgetBase {
-    _datasource: { _constraints: string; };
-    filter: { [key: string ]: string; };
+    _datasource: {
+        _constraints: string;
+        _pageObjs: mendix.lib.MxObject[];
+    };
+    datasource: {
+        type: "microflow" | "entityPath" | "database" | "xpath";
+    };
+    filter: {
+        [ key: string ]: string;
+    };
     update: (obj?: mendix.lib.MxObject | null, callback?: () => void) => void;
+    _entity: string;
+    __customWidgetDataSourceHelper: DataSourceHelper;
 }
 
 export interface ContainerState {
@@ -41,12 +52,14 @@ export interface ContainerState {
 }
 
 export default class SearchContainer extends Component<ContainerProps, ContainerState> {
+    private dataSourceHelper: DataSourceHelper;
+    private errorMessage: string;
 
     constructor(props: ContainerProps) {
         super(props);
 
         this.state = { listviewAvailable: true };
-        this.handleChange = this.handleChange.bind(this);
+        this.applySearch = this.applySearch.bind(this);
         // Ensures that the listView is connected so the widget doesn't break in mobile due to unpredictable render time
         this.connectToListView = this.connectToListView.bind(this);
         dojoConnect.connect(props.mxform, "onNavigation", this, this.connectToListView);
@@ -64,7 +77,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
     }
 
     private renderAlert() {
-        const errorMessage = Utils.validate({
+        this.errorMessage = Utils.validate({
             ...this.props as ContainerProps,
             filterNode: this.state.targetNode,
             targetListView: this.state.targetListView,
@@ -74,7 +87,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
         return createElement(Alert, {
             bootstrapStyle: "danger",
             className: "widget-text-box-search-alert",
-            message: errorMessage
+            message: this.errorMessage
         });
     }
 
@@ -83,7 +96,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
 
             return createElement(TextBoxSearch, {
                 defaultQuery: this.props.defaultQuery,
-                onTextChangeAction: this.handleChange,
+                onTextChangeAction: this.applySearch,
                 placeholder: this.props.placeHolder
             });
         }
@@ -91,35 +104,27 @@ export default class SearchContainer extends Component<ContainerProps, Container
         return null;
     }
 
-    private handleChange(query: string) {
-        const { targetListView, targetNode } = this.state;
-        this.showLoader(targetNode);
+    private applySearch(searchQuery: string) {
+        // construct constraint based on search query
+        const constraint = this.getConstraint(searchQuery);
+        if (this.dataSourceHelper) {
+            this.dataSourceHelper.setConstraint(this.props.friendlyId, constraint);
+        }
+    }
+
+    private getConstraint(searchQuery: string) {
+        const { targetListView } = this.state;
         const constraints: string[] = [];
-        if (targetListView && targetListView._datasource && targetNode) {
+        if (targetListView && targetListView._datasource) {
             const isReference = this.props.entity && Utils.itContains(this.props.entity, "/");
             this.props.attributetList.forEach(searchAttribute => {
                 isReference
                     ?
-                    targetListView._datasource._constraints = `${this.props.entity}[contains(${searchAttribute.attribute},'${query}')]`
+                    constraints.push(`${this.props.entity}[contains(${searchAttribute.attribute},'${searchQuery}')]`)
                     :
-                    constraints.push(`contains(${searchAttribute.attribute},'${query}')`);
+                    constraints.push(`contains(${searchAttribute.attribute},'${searchQuery}')`);
             });
-            targetListView._datasource._constraints = "[" + constraints.join(" or ") + "]";
-            targetListView.update(null, () => {
-                this.hideLoader(targetNode);
-            });
-        }
-    }
-
-    private showLoader(node?: HTMLElement) {
-        if (node) {
-            node.classList.add("widget-text-box-search-loading");
-        }
-    }
-
-    private hideLoader(node?: HTMLElement) {
-        if (node) {
-            node.classList.remove("widget-text-box-search-loading");
+            return "[" + constraints.join(" or ") + "]";
         }
     }
 
@@ -132,16 +137,30 @@ export default class SearchContainer extends Component<ContainerProps, Container
             this.setState({ targetNode });
             targetListView = dijitRegistry.byNode(targetNode);
             if (targetListView) {
-                targetListView.filter = {};
-                this.setState({ targetListView });
+                if (!targetListView.__customWidgetDataSourceHelper) {
+                    try {
+                        targetListView.__customWidgetDataSourceHelper = new DataSourceHelper(targetListView);
+                    } catch (error) {
+                        console.log("failed to instantiate DataSourceHelper \n" + error); // tslint:disable-line
+                    }
+                } else if (!DataSourceHelper.checkVersionCompatible(targetListView.__customWidgetDataSourceHelper.version)) {
+                    console.log("Compartibility issue"); // tslint:disable-line
+                }
+                this.dataSourceHelper = targetListView.__customWidgetDataSourceHelper;
+
+                const validateMessage = Utils.validate({
+                    ...this.props as ContainerProps,
+                    filterNode: targetNode,
+                    targetListView,
+                    validate: true
+                });
+                this.setState({
+                    listviewAvailable: !!targetListView,
+                    targetListView,
+                    targetNode,
+                    validationPassed: !validateMessage
+                });
             }
         }
-        const validateMessage = Utils.validate({
-            ...this.props as ContainerProps,
-            filterNode: targetNode,
-            targetListView,
-            validate: true
-        });
-        this.setState({ listviewAvailable: false, validationPassed: !validateMessage });
     }
 }
