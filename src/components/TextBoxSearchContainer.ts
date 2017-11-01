@@ -6,7 +6,7 @@ import * as classNames from "classnames";
 
 import { TextBoxSearch, TextBoxSearchProps } from "./TextBoxSearch";
 import { Utils, parseStyle } from "../utils/ContainerUtils";
-import { DataSourceHelper } from "../utils/DataSourceHelper/DataSourceHelper";
+import { DataSourceHelper, ListView } from "data-source-helper";
 import { Alert } from "./Alert";
 
 interface WrapperProps {
@@ -28,23 +28,8 @@ export interface SearchAttributes {
     attribute: string;
 }
 
-export interface ListView extends mxui.widget._WidgetBase {
-    _datasource: {
-        _constraints: string;
-        _pageObjs: mendix.lib.MxObject[];
-    };
-    datasource: {
-        type: "microflow" | "entityPath" | "database" | "xpath";
-    };
-    filter: {
-        [ key: string ]: string;
-    };
-    update: (obj?: mendix.lib.MxObject | null, callback?: () => void) => void;
-    _entity: string;
-    __customWidgetDataSourceHelper: DataSourceHelper;
-}
-
 export interface ContainerState {
+    alertMessage?: string;
     listviewAvailable: boolean;
     targetListView?: ListView;
     targetNode?: HTMLElement;
@@ -58,9 +43,11 @@ export default class SearchContainer extends Component<ContainerProps, Container
     constructor(props: ContainerProps) {
         super(props);
 
-        this.state = { listviewAvailable: true };
+        this.state = {
+            alertMessage: "",
+            listviewAvailable: true
+        };
         this.applySearch = this.applySearch.bind(this);
-        // Ensures that the listView is connected so the widget doesn't break in mobile due to unpredictable render time
         this.connectToListView = this.connectToListView.bind(this);
         dojoConnect.connect(props.mxform, "onNavigation", this, this.connectToListView);
     }
@@ -129,37 +116,44 @@ export default class SearchContainer extends Component<ContainerProps, Container
     }
 
     private connectToListView() {
-        const filterNode = findDOMNode(this).parentNode as HTMLElement;
-        const targetNode = Utils.findTargetNode(filterNode);
-        let targetListView: ListView | null = null;
+        if (!this.state.validationPassed) {
+            const queryNode = findDOMNode(this).parentNode as HTMLElement;
+            const targetNode = Utils.findTargetNode(queryNode);
+            let targetListView: ListView | null = null;
 
-        if (targetNode) {
-            this.setState({ targetNode });
-            targetListView = dijitRegistry.byNode(targetNode);
-            if (targetListView) {
-                if (!targetListView.__customWidgetDataSourceHelper) {
-                    try {
-                        targetListView.__customWidgetDataSourceHelper = new DataSourceHelper(targetListView);
-                    } catch (error) {
-                        console.log("failed to instantiate DataSourceHelper \n" + error); // tslint:disable-line
+            if (targetNode) {
+                targetListView = dijitRegistry.byNode(targetNode);
+                if (targetListView) {
+                    if (!targetListView.__customWidgetDataSourceHelper) {
+                        try {
+                            targetListView.__customWidgetDataSourceHelper = new DataSourceHelper(targetListView, this.props.friendlyId);
+                        } catch (error) {
+                            this.setState({
+                                alertMessage: error.message,
+                                targetListView,
+                                targetNode
+                            });
+                        }
                     }
-                } else if (!DataSourceHelper.checkVersionCompatible(targetListView.__customWidgetDataSourceHelper.version)) {
-                    console.log("Compartibility issue"); // tslint:disable-line
-                }
-                this.dataSourceHelper = targetListView.__customWidgetDataSourceHelper;
+                    this.dataSourceHelper = targetListView.__customWidgetDataSourceHelper as DataSourceHelper;
+                    const versionCompatibilityMessage = this.dataSourceHelper
+                                                            .versionCompatibility(DataSourceHelper.VERSION, this.props.friendlyId);
 
-                const validateMessage = Utils.validate({
-                    ...this.props as ContainerProps,
-                    filterNode: targetNode,
-                    targetListView,
-                    validate: true
-                });
-                this.setState({
-                    listviewAvailable: !!targetListView,
-                    targetListView,
-                    targetNode,
-                    validationPassed: !validateMessage
-                });
+                    const validateMessage = Utils.validate({
+                        ...this.props as ContainerProps,
+                        filterNode: targetNode,
+                        targetListView,
+                        validate: !this.state.listviewAvailable
+                    });
+
+                    this.setState({
+                        alertMessage: versionCompatibilityMessage,
+                        listviewAvailable: false,
+                        targetListView,
+                        targetNode,
+                        validationPassed: !validateMessage
+                    });
+                }
             }
         }
     }

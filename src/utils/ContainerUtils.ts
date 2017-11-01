@@ -1,4 +1,5 @@
-import { ContainerProps, ListView } from "../components/TextBoxSearchContainer";
+import { ContainerProps } from "../components/TextBoxSearchContainer";
+import { ListView } from "data-source-helper";
 
 export const parseStyle = (style = ""): {[key: string]: string} => {
     try {
@@ -18,18 +19,22 @@ export const parseStyle = (style = ""): {[key: string]: string} => {
     return {};
 };
 
+const showAlert = (friendlyId: string, message: string) => `Custom widget ${friendlyId} Error in configuration: ${message}`;
+
 export class Utils {
     static validate(props: ContainerProps & { filterNode: HTMLElement; targetListView: ListView; validate: boolean, isModeler?: boolean}): string {
-        const widgetName = "text-box search";
 
         if (!(props.targetListView && props.targetListView._datasource)) {
-            return `Widget ${widgetName}: is not compatible with a specified list`;
+            return showAlert(props.friendlyId, "is not compatible with a specified list");
         }
         if (!props.filterNode) {
-            return `Widget ${widgetName}: unable to find list to connect`;
+            return showAlert(props.friendlyId, "unable to find a list view on the page");
         }
         if (props.isModeler) {
             return "";
+        }
+        if (props.targetListView && !Utils.isCompatible(props.targetListView)) {
+            return showAlert(props.friendlyId, "this Mendix version is incompatible");
         }
 
         return "";
@@ -49,6 +54,17 @@ export class Utils {
         }
 
         return targetNode;
+    }
+
+    static isCompatible(targetListView: ListView): boolean {
+        return !!(targetListView &&
+            targetListView.update &&
+            targetListView.datasource &&
+            targetListView.datasource.type &&
+            (targetListView.datasource.type === "database" || targetListView.datasource.type === "xpath") &&
+            targetListView._datasource &&
+            targetListView._datasource._entity &&
+            targetListView._datasource._sorting);
     }
 
     static itContains(array: string[] | string, element: string) {
