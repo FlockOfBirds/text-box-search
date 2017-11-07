@@ -101,6 +101,6 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "data-source-helper": "^0.1.1"
+    "mendix-data-source-helper": "^0.1.2-rc1"
   }
 }
