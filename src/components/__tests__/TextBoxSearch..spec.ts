@@ -89,8 +89,8 @@ describe("TextBoxSearch", () => {
             expect(searchBar.state().query).toEqual("Birds");
         });
 
-        it("updates when the search value changes", (done) => {
-            const newValue = "NET";
+        it("updates when the search value changes", () => {
+            const newValue = "en";
             const barProps: TextBoxSearchProps = {
                 ...textSearchProps,
                 onTextChangeAction: value => value
@@ -99,16 +99,15 @@ describe("TextBoxSearch", () => {
             const wrapper = renderSearchBar(barProps);
             const input: any = wrapper.find("input");
 
-            input.simulate("change", { currentTarget: { value: "SA" } });
+            input.simulate("change", { currentTarget: { value: "as" } });
 
             setTimeout(() => {
-                expect(barProps.onTextChangeAction).toHaveBeenCalledWith("SA");
+                expect(barProps.onTextChangeAction).toHaveBeenCalledWith("as");
 
                 input.simulate("change", { currentTarget: { value: newValue } });
 
                 setTimeout(() => {
                     expect(barProps.onTextChangeAction).toHaveBeenCalledWith(newValue);
-                    done();
                 }, 1000);
             }, 1000);
         });
