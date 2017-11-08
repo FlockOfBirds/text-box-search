@@ -9,7 +9,7 @@
             <category>General</category>
             <description>Entity whose attributes will be searched. This entity should match the list view entity</description>
         </property>
-        <property key="attributetList" type="object" isList="true">
+        <property key="attributeList" type="object" isList="true">
             <caption>Attributes</caption>
             <category>General</category>
             <description/>

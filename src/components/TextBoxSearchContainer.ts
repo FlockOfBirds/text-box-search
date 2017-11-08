@@ -18,7 +18,7 @@ interface WrapperProps {
 }
 
 export interface ContainerProps extends WrapperProps {
-    attributetList: SearchAttributes[];
+    attributeList: SearchAttributes[];
     defaultQuery: string;
     entity: string;
     placeHolder: string;
@@ -100,7 +100,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
         const constraints: string[] = [];
 
         if (targetListView && targetListView._datasource) {
-            this.props.attributetList.forEach(searchAttribute => {
+            this.props.attributeList.forEach(searchAttribute => {
                 constraints.push(`contains(${searchAttribute.attribute},'${searchQuery}')`);
             });
 

@@ -37,11 +37,11 @@ export class Utils {
         if (props.entity) {
             return `${props.friendlyId}: Requires a list view entity`;
         }
-        if (props.attributetList && props.attributetList.length === 0) {
+        if (props.attributeList && props.attributeList.length === 0) {
             return `${props.friendlyId}: Requires atleast a one attribute`;
         }
-        if (props.attributetList && props.attributetList.length) {
-            if (props.attributetList.filter(attribute => attribute.attribute.trim() === "").length) {
+        if (props.attributeList && props.attributeList.length) {
+            if (props.attributeList.filter(attribute => attribute.attribute.trim() === "").length) {
                 return `${props.friendlyId}: Atleast one attribute is empty, select an attribute`;
             }
         }

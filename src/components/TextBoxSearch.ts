@@ -30,8 +30,7 @@ export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchSt
                 placeholder: this.props.placeholder,
                 value: this.state.query
             }),
-            createElement("button",
-                {
+            createElement("button", {
                     className: `btn-transparent ${this.state.query ? "visible" : "hidden"}`,
                     onClick: this.resetQuery
                 },
