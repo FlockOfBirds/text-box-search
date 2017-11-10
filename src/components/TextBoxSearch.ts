@@ -5,7 +5,7 @@ import "./ui/TextBoxSearch.scss";
 export interface TextBoxSearchProps {
     defaultQuery: string;
     placeholder?: string;
-    onTextChangeAction: (query: string) => void;
+    onTextChange: (query: string) => void;
 }
 
 interface TextBoxSearchState {
@@ -13,11 +13,12 @@ interface TextBoxSearchState {
 }
 
 export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchState> {
+    private searchTimeOut = 500;
 
     constructor(props: TextBoxSearchProps) {
         super(props);
 
-        this.state = { query: "" };
+        this.state = { query: this.props.defaultQuery };
         this.resetQuery = this.resetQuery.bind(this);
         this.handleOnChange = this.handleOnChange.bind(this);
     }
@@ -38,16 +39,9 @@ export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchSt
             )
         );
     }
-
-    componentDidMount() {
-        this.setState({ query: this.props.defaultQuery });
-    }
-
-    componentDidUpdate(_prevProps: TextBoxSearchProps, prevState: TextBoxSearchState) {
-        if (this.state.query !== prevState.query) {
-            setTimeout(() => {
-                this.props.onTextChangeAction(this.state.query);
-            }, this.geTimeOut());
+    componentWillReceiveProps(newProps: TextBoxSearchProps) {
+        if (this.state.query !== newProps.defaultQuery) {
+            this.setState({ query: this.props.defaultQuery });
         }
     }
 
@@ -56,14 +50,10 @@ export class TextBoxSearch extends Component<TextBoxSearchProps, TextBoxSearchSt
 
         if (this.state.query !== query) {
             setTimeout(() => {
-                this.props.onTextChangeAction(query);
-            }, this.geTimeOut());
+                this.props.onTextChange(query);
+            }, this.searchTimeOut);
         }
         this.setState({ query });
-    }
-
-    private geTimeOut(): number {
-        return this.props.defaultQuery ? 0 : 500;
     }
 
     private resetQuery() {

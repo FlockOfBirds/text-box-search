@@ -51,11 +51,11 @@ export class Utils {
     static validateCompatibility(props: ContainerProps & { targetListView: ListView }): string {
         const widgetName = props.friendlyId;
         if (!(props.targetListView && props.targetListView._datasource)) {
-            return `${widgetName}: unable to find a listview with to attach to`;
+            return `${widgetName}: Unable to find a listview with to connect`;
         }
         if (props.entity && !Utils.itContains(props.entity, "/")) {
             if (props.entity !== props.targetListView._entity) {
-                return `${widgetName}: supplied entity "${props.entity}" does not belong to list view data source`;
+                return `${widgetName}: Supplied entity "${props.entity}" does not belong to list view data source`;
             }
         }
         return "";

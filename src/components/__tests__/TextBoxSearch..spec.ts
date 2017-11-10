@@ -8,7 +8,7 @@ describe("TextBoxSearch", () => {
     const mountSearchBar = (props: TextBoxSearchProps) => mount(createElement(TextBoxSearch, props));
     const textSearchProps: TextBoxSearchProps = {
         defaultQuery: "",
-        onTextChangeAction:  jasmine.any(Function) as any,
+        onTextChange:  jasmine.any(Function) as any,
         placeholder: "search"
     };
 
@@ -37,7 +37,7 @@ describe("TextBoxSearch", () => {
     it("renders with the specified placeholder", () => {
         const newSearchProps: TextBoxSearchProps = {
             defaultQuery: "query",
-            onTextChangeAction:  jasmine.any(Function) as any,
+            onTextChange:  jasmine.any(Function) as any,
             placeholder: "search"
         };
         const searchBar = renderSearchBar(newSearchProps);
@@ -62,16 +62,16 @@ describe("TextBoxSearch", () => {
             const newValue = "Kenya";
             const barProps: TextBoxSearchProps = {
                 ...textSearchProps,
-                onTextChangeAction: value => value
+                onTextChange: value => value
             };
-            spyOn(barProps, "onTextChangeAction").and.callThrough();
+            spyOn(barProps, "onTextChange").and.callThrough();
             const wrapper = renderSearchBar(barProps);
             const input: any = wrapper.find("input");
 
             input.simulate("change", { currentTarget: { value: newValue } });
 
             setTimeout(() => {
-                expect(barProps.onTextChangeAction).toHaveBeenCalledWith(newValue);
+                expect(barProps.onTextChange).toHaveBeenCalledWith(newValue);
                 done();
             }, 1000);
         });
@@ -79,7 +79,7 @@ describe("TextBoxSearch", () => {
         it("renders with specified default query", () => {
             const newSearchProps: TextBoxSearchProps = {
                 defaultQuery: "Birds",
-                onTextChangeAction: jasmine.any(Function) as any,
+                onTextChange: jasmine.any(Function) as any,
                 placeholder: "search"
             };
             const searchBar = renderSearchBar(newSearchProps);
@@ -93,21 +93,21 @@ describe("TextBoxSearch", () => {
             const newValue = "en";
             const barProps: TextBoxSearchProps = {
                 ...textSearchProps,
-                onTextChangeAction: value => value
+                onTextChange: value => value
             };
-            spyOn(barProps, "onTextChangeAction").and.callThrough();
+            spyOn(barProps, "onTextChange").and.callThrough();
             const wrapper = renderSearchBar(barProps);
             const input: any = wrapper.find("input");
 
             input.simulate("change", { currentTarget: { value: "as" } });
 
             setTimeout(() => {
-                expect(barProps.onTextChangeAction).toHaveBeenCalledWith("as");
+                expect(barProps.onTextChange).toHaveBeenCalledWith("as");
 
                 input.simulate("change", { currentTarget: { value: newValue } });
 
                 setTimeout(() => {
-                    expect(barProps.onTextChangeAction).toHaveBeenCalledWith(newValue);
+                    expect(barProps.onTextChange).toHaveBeenCalledWith(newValue);
                 }, 1000);
             }, 1000);
         });

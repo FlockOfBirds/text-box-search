@@ -30,7 +30,7 @@ export interface SearchAttributes {
 
 export interface ContainerState {
     alertMessage?: string;
-    listviewAvailable: boolean;
+    listViewAvailable: boolean;
     targetListView?: ListView;
     targetNode?: HTMLElement;
     validationPassed?: boolean;
@@ -38,18 +38,18 @@ export interface ContainerState {
 
 export default class SearchContainer extends Component<ContainerProps, ContainerState> {
     private dataSourceHelper: DataSourceHelper;
+    private navigationHandler: object;
 
     constructor(props: ContainerProps) {
         super(props);
 
         this.state = {
             alertMessage: "",
-            listviewAvailable: true
+            listViewAvailable: false
         };
 
         this.applySearch = this.applySearch.bind(this);
-        this.connectToListView = this.connectToListView.bind(this);
-        dojoConnect.connect(props.mxform, "onNavigation", this, this.connectToListView);
+        this.navigationHandler = dojoConnect.connect(props.mxform, "onNavigation", this, this.connectToListView.bind(this));
     }
 
     componentDidMount() {
@@ -58,6 +58,16 @@ export default class SearchContainer extends Component<ContainerProps, Container
         if (targetNode) {
             DataSourceHelper.hideContent(targetNode);
         }
+    }
+
+    componentDidUpdate(_prevProps: ContainerProps, prevState: ContainerState) {
+        if (this.state.listViewAvailable && !prevState.listViewAvailable) {
+            this.applySearch(this.props.defaultQuery);
+        }
+    }
+
+    componentWillUnmount() {
+        dojoConnect.disconnect(this.navigationHandler);
     }
 
     render() {
@@ -78,7 +88,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
         if (!this.state.alertMessage) {
             return createElement(TextBoxSearch, {
                 defaultQuery: this.props.defaultQuery,
-                onTextChangeAction: this.applySearch,
+                onTextChange: this.applySearch,
                 placeholder: this.props.placeHolder
             });
         }
@@ -110,7 +120,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
 
     private connectToListView() {
         const queryNode = findDOMNode(this).parentNode as HTMLElement;
-        const targetNode = Utils.findTargetNode(queryNode);
+        const targetNode = Utils.findTargetNode(queryNode) as HTMLElement;
         let targetListView: ListView | null = null;
         let errorMessage = "";
 
@@ -118,7 +128,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
             targetListView = dijitRegistry.byNode(targetNode);
             if (targetListView) {
                 try {
-                    this.dataSourceHelper = new DataSourceHelper(targetNode, targetListView, this.props.friendlyId, DataSourceHelper.VERSION);
+                    this.dataSourceHelper = DataSourceHelper.getInstance(targetListView, this.props.friendlyId, DataSourceHelper.VERSION);
                 } catch (error) {
                     errorMessage = error.message;
                 }
@@ -132,7 +142,7 @@ export default class SearchContainer extends Component<ContainerProps, Container
 
         this.setState({
             alertMessage: validationMessage || errorMessage,
-            listviewAvailable: !!targetListView,
+            listViewAvailable: !!targetListView,
             targetListView,
             targetNode
         });

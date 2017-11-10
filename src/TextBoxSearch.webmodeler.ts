@@ -26,7 +26,7 @@ export class preview extends Component<ContainerProps, ContainerState> {
             }),
             createElement(TextBoxSearch, {
                 defaultQuery: "",
-                onTextChangeAction: () => { return; },
+                onTextChange: () => { return; },
                 placeholder: "Search"
             })
         );
