@@ -19,7 +19,20 @@ Mendix 7.7.1
 
 [https://textboxsearch.mxapps.io/](https://textboxsearch.mxapps.io/)
 
+![Demo](assets/demo.gif)
+
 ## Usage
+
+Configure the widget as below.
+
+![General](assets/general.jpg)
+
+- On the `List view with entity` option of the `General` tab, select an entity that matches listview entity.
+
+- On the `Attributes` option of the `General` tab, create attributes to be used in the text search.
+
+![General](assets/attribute.jpg)
+![General](assets/attributeSelect.jpg)
 
 ## Issues, suggestions and feature requests
 Please report issues at [https://github.com/mendixlabs/text-box-search/issues](https://github.com/mendixlabs/text-box-search/issues).
