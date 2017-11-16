@@ -32,7 +32,6 @@ Configure the widget as below.
 - On the `Attributes` option of the `General` tab, create attributes to be used in the text search.
 
 ![General](assets/attribute.jpg)
-![General](assets/attributeSelect.jpg)
 
 ## Issues, suggestions and feature requests
 Please report issues at [https://github.com/mendixlabs/text-box-search/issues](https://github.com/mendixlabs/text-box-search/issues).
